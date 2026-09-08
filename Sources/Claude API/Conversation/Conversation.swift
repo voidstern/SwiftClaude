@@ -6,7 +6,7 @@ public import Tool
   public import UIKit
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   public import AppKit
 #endif
 
@@ -84,7 +84,7 @@ extension Claude.Conversation where UserMessageImage == Never {
   }
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   extension Claude.Conversation where UserMessageImage == NSImage {
 
     public static func image(

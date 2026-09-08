@@ -7,7 +7,7 @@ let package = Package(
   name: "SwiftClaude",
   platforms: [
     .macOS("15.0"),
-    .iOS("18.0"),
+    .iOS("17.0"),
     .watchOS("11.0"),
     .tvOS("18.0"),
     .visionOS("2.0"),
@@ -97,7 +97,8 @@ let package = Package(
       ],
       path: "Tests/Tool Macros Tests"
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v5]
 )
 
 extension Array where Element == Platform {

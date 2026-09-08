@@ -1,5 +1,6 @@
 extension ToolInput {
 
+#if compiler(<6.4)
   // Needs to be disfavored because otherwise it catches single-element tuples
   @_disfavoredOverload
   public static func schema<each Element: ToolInput.SchemaCodable>(
@@ -12,6 +13,7 @@ extension ToolInput {
       ))
     )
   }
+#endif
 
 }
 

@@ -3,7 +3,7 @@ public import ClaudeMessagesEndpoint
 
 private import struct Foundation.Data
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   public import AppKit
 #endif
 
@@ -43,7 +43,7 @@ extension Claude {
       }
     #endif
 
-    #if canImport(AppKit)
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
       public init(
         _ image: NSImage
       ) {
@@ -143,7 +143,7 @@ private protocol PlatformImageBacking {
 
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
   extension NSImage: PlatformImageBacking {
 

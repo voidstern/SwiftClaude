@@ -6,7 +6,7 @@ public import Observation
   public import UIKit
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   public import AppKit
 #endif
 
@@ -169,7 +169,7 @@ extension Claude.ConversationUserMessage: ExpressibleByStringInterpolation {
 
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
   extension Claude.ConversationUserMessage.StringInterpolation
   where Conversation.UserMessageImage == NSImage {

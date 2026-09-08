@@ -138,6 +138,7 @@ extension ToolInput {
     values.schema
   }
 
+#if compiler(<6.4)
   public static func enumCaseAssociatedValuesSchema<
     Key: CodingKey,
     each ValueSchema: Schema
@@ -160,7 +161,6 @@ extension ToolInput {
       )
     )
   }
-
   public static func enumCaseAssociatedValuesSchema<
     Key: CodingKey,
     each ValueSchema: Schema
@@ -180,6 +180,7 @@ extension ToolInput {
       ))
     )
   }
+#endif
 
 }
 

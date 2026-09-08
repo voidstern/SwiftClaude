@@ -23,7 +23,7 @@ extension ClaudeClient {
       }
 
       package mutating func next(isolation actor: isolated (any Actor)?) async throws -> Element? {
-        switch try await events.next(isolation: actor) {
+        switch try await events.next() {
         case .success(let rawEvent):
           do {
             return .success(
@@ -100,7 +100,7 @@ extension ClaudeClient {
       }
 
       mutating func next(isolation actor: isolated (any Actor)?) async throws -> Element? {
-        guard let eventLine = try await lines.next(isolation: actor) else {
+        guard let eventLine = try await lines.next() else {
           return nil
         }
 
@@ -108,14 +108,14 @@ extension ClaudeClient {
         let eventName = try eventLine.removePrefix("event: ")
 
         guard
-          let dataLine = try await lines.next(isolation: actor)
+          let dataLine = try await lines.next()
         else {
           return .failure(.partialTrailingText("\(eventLine)\n)"))
         }
         let data = try dataLine.removePrefix("data: ")
 
         guard
-          let emptyLine = try await lines.next(isolation: actor),
+          let emptyLine = try await lines.next(),
           emptyLine.isEmpty
         else {
           return .failure(.partialTrailingText("\(eventLine)\n\(dataLine)"))
@@ -169,7 +169,7 @@ extension ClaudeClient.RawServerSentEvents {
           return next
         }
         /// Read segments awaiting a line
-        while let segment = try await segments.next(isolation: actor) {
+        while let segment = try await segments.next() {
           lineReader.append(segment)
           if let next = lineReader.readLine() {
             return next

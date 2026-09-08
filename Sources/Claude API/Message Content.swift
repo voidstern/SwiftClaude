@@ -5,7 +5,7 @@ public import ClaudeMessagesEndpoint
   public import UIKit
 #endif
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
   public import AppKit
 #endif
 
@@ -88,7 +88,7 @@ extension Claude {
         }
       #endif
 
-      #if canImport(AppKit)
+      #if canImport(AppKit) && !targetEnvironment(macCatalyst)
         public static func image(
           _ image: NSImage
         ) -> Self {
@@ -371,7 +371,7 @@ extension Claude.SupportsImagesInMessageContent {
     }
   #endif
 
-  #if canImport(AppKit)
+  #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     public init(
       _ image: NSImage
     ) {
@@ -401,7 +401,7 @@ extension Claude.SupportsImagesInMessageContent where Self: Claude.MessageConten
     }
   #endif
 
-  #if canImport(AppKit)
+  #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     public mutating func append(
       _ image: NSImage
     ) {
@@ -436,7 +436,7 @@ where Component: Claude.SupportsImagesInMessageContent {
     }
   #endif
 
-  #if canImport(AppKit)
+  #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     public mutating func appendInterpolation(
       _ image: NSImage,
       cacheBreakpoint: Claude.Beta.CacheBreakpoint? = nil
@@ -476,7 +476,7 @@ extension Claude.MessageContentBuilder where Result: Claude.SupportsImagesInMess
     }
   #endif
 
-  #if canImport(AppKit)
+  #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     public static func buildExpression(
       _ image: NSImage
     ) -> Component {
