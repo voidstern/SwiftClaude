@@ -2,6 +2,7 @@ import HTTPTypes
 package import Tool
 
 package import struct Foundation.Data
+private import protocol Foundation.LocalizedError
 
 public actor ClaudeClient {
 
@@ -158,9 +159,13 @@ public actor ClaudeClient {
   private struct Unauthenticated: Error {
 
   }
-  private struct InvalidResponseStatus: Error {
+  private struct InvalidResponseStatus: Error, LocalizedError {
     let status: HTTPResponse.Status
     let body: String
+
+    var errorDescription: String? {
+      return body.isEmpty ? "Claude API returned HTTP \(status.code)." : "Claude API returned HTTP \(status.code): \(body)"
+    }
   }
 }
 
