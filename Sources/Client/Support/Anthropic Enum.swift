@@ -205,7 +205,7 @@ private struct AnthropicEnumDecodingContainer<Key: CodingKey>: KeyedDecodingCont
         Key.self,
         DecodingError.Context(
           codingPath: decoder.codingPath,
-          debugDescription: "Invalid number of keys found, expected one."
+          debugDescription: "Unsupported content/event type '\(key_string)' (mapped to '\(keyString)') for \(Key.self)."
         )
       )
     }

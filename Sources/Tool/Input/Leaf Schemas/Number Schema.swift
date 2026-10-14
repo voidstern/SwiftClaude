@@ -9,7 +9,7 @@ extension ToolInput {
 }
 
 extension Float: ToolInput.SchemaCodable {}
-#if !targetEnvironment(macCatalyst)
+#if !os(macOS) && !targetEnvironment(macCatalyst)
 extension Float16: ToolInput.SchemaCodable {}
 #endif
 extension Double: ToolInput.SchemaCodable {}
