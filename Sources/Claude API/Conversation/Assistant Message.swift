@@ -117,12 +117,14 @@ extension Claude {
     }
 
     public var currentContentBlocks: [ContentBlock] {
-      currentPrivateContentBlocks.map { block in
+      currentPrivateContentBlocks.compactMap { block in
         switch block {
         case .textBlock(let textBlock):
           .textBlock(textBlock)
         case .toolUseBlock(let toolUseBlock, _):
           .toolUseBlock(toolUseBlock)
+        case .thinkingBlock:
+          nil
         }
       }
     }
@@ -140,6 +142,7 @@ extension Claude {
     fileprivate enum PrivateContentBlock {
       case textBlock(TextBlock)
       case toolUseBlock(ToolUseBlock, any PrivateToolUseProtocol<Conversation.ToolOutput>)
+      case thinkingBlock(ConversationAssistantMessageThinkingBlock)
     }
     fileprivate var currentPrivateContentBlocks: [PrivateContentBlock] = []
 
@@ -387,6 +390,50 @@ extension Claude {
 
 // MARK: Assistant Message Proxies
 
+/// ponytail: Preserve thinking for replay without exposing it as visible content. A reasoning UI can add a public block API when needed.
+private final class ConversationAssistantMessageThinkingBlock: ClaudeClient.MessagesEndpoint.StreamingMessageContentBlock {
+
+  enum Content {
+    case thinking(String, signature: String)
+    case redactedThinking(String)
+  }
+
+  init(content: Content) {
+    self.content = content
+  }
+
+  func update(with delta: Delta) throws {
+    switch (content, delta) {
+    case (.thinking(let text, let signature), .thinkingDelta(let delta)):
+      content = .thinking(text + delta.thinking, signature: signature)
+    case (.thinking(let text, let signature), .signatureDelta(let delta)):
+      content = .thinking(text, signature: signature + delta.signature)
+    default:
+      throw UnexpectedThinkingDelta()
+    }
+  }
+
+  func stop(dueTo error: Error?, isolation: isolated Actor) async throws {
+    result = error.map { .failure($0) } ?? .success(())
+  }
+
+  func contentBlock() throws -> ClaudeClient.MessagesEndpoint.Request.Message.Content.Block {
+    guard let result else { throw IncompleteMessage() }
+    try result.get()
+    switch content {
+    case .thinking(let text, let signature):
+      guard !signature.isEmpty else { throw IncompleteMessage() }
+      return .thinking(text, signature: signature)
+    case .redactedThinking(let data):
+      return .redactedThinking(data)
+    }
+  }
+
+  private var content: Content
+  private var result: Result<Void, Error>?
+  private struct UnexpectedThinkingDelta: Error {}
+}
+
 extension Claude.ConversationAssistantMessageTextBlock {
 
   fileprivate typealias Delta = ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockDelta.Delta
@@ -449,6 +496,14 @@ extension Claude.ConversationAssistantMessage {
       )
       currentPrivateContentBlocks.append(.textBlock(block))
       return ConversationAssistantMessageTextBlockProxy(textBlock: block)
+    case .thinking(let event):
+      let block = ConversationAssistantMessageThinkingBlock(content: .thinking(event.thinking, signature: event.signature))
+      currentPrivateContentBlocks.append(.thinkingBlock(block))
+      return block
+    case .redactedThinking(let event):
+      let block = ConversationAssistantMessageThinkingBlock(content: .redactedThinking(event.data))
+      currentPrivateContentBlocks.append(.thinkingBlock(block))
+      return block
     case .toolUse(let toolUseEvent):
       guard let toolKit else {
         throw Claude.ToolUseUnavailable()
@@ -555,6 +610,8 @@ extension Claude.ConversationAssistantMessage {
       switch block {
       case .textBlock(let textBlock):
         assistantContent.append(textBlock.currentText)
+      case .thinkingBlock(let thinkingBlock):
+        assistantContent.append(try thinkingBlock.contentBlock())
       case .toolUseBlock(_, let toolUse):
         assistantContent.append(
           try toolUse.contentBlock(

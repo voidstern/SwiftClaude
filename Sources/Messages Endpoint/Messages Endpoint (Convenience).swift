@@ -9,6 +9,10 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockDelta.Delta {
         return delta
       case .inputJsonDelta:
         throw Error.InvalidDelta(expected: .text, observed: .inputJson)
+      case .thinkingDelta:
+        throw Error.InvalidDelta(expected: .text, observed: .thinking)
+      case .signatureDelta:
+        throw Error.InvalidDelta(expected: .text, observed: .signature)
       }
     }
   }
@@ -20,6 +24,10 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockDelta.Delta {
         throw Error.InvalidDelta(expected: .inputJson, observed: .text)
       case .inputJsonDelta(let delta):
         return delta
+      case .thinkingDelta:
+        throw Error.InvalidDelta(expected: .inputJson, observed: .thinking)
+      case .signatureDelta:
+        throw Error.InvalidDelta(expected: .inputJson, observed: .signature)
       }
     }
   }
@@ -27,7 +35,7 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockDelta.Delta {
   private enum Error {
     struct InvalidDelta: Swift.Error {
       enum Kind {
-        case text, inputJson
+        case text, inputJson, thinking, signature
       }
       let expected: Kind
       let observed: Kind
@@ -45,6 +53,8 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockStart.Content
         return text
       case .toolUse:
         throw Error.InvalidDelta(expected: .text, observed: .inputJson)
+      case .thinking, .redactedThinking:
+        throw Error.InvalidDelta(expected: .text, observed: .thinking)
       }
     }
   }
@@ -56,6 +66,8 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockStart.Content
         throw Error.InvalidDelta(expected: .inputJson, observed: .text)
       case .toolUse(let delta):
         return delta
+      case .thinking, .redactedThinking:
+        throw Error.InvalidDelta(expected: .inputJson, observed: .thinking)
       }
     }
   }
@@ -70,7 +82,7 @@ extension ClaudeClient.MessagesEndpoint.Response.Event.ContentBlockStart.Content
     }
     struct InvalidDelta: Swift.Error {
       enum Kind {
-        case text, inputJson
+        case text, inputJson, thinking
       }
       let expected: Kind
       let observed: Kind

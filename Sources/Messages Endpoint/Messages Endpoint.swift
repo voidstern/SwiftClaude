@@ -487,6 +487,17 @@ extension ClaudeClient.MessagesEndpoint.Response {
         }
         case text(Text)
 
+        public struct Thinking: Decodable {
+          public let thinking: String
+          public let signature: String
+        }
+        case thinking(Thinking)
+
+        public struct RedactedThinking: Decodable {
+          public let data: String
+        }
+        case redactedThinking(RedactedThinking)
+
         public struct ToolUse: Decodable {
           public let name: String
           public let id: ClaudeClient.MessagesEndpoint.ToolUse.ID
@@ -510,6 +521,16 @@ extension ClaudeClient.MessagesEndpoint.Response {
           public let text: String
         }
         case textDelta(TextDelta)
+
+        public struct ThinkingDelta: Decodable {
+          public let thinking: String
+        }
+        case thinkingDelta(ThinkingDelta)
+
+        public struct SignatureDelta: Decodable {
+          public let signature: String
+        }
+        case signatureDelta(SignatureDelta)
 
         public struct InputJsonDelta: Decodable {
           public let partialJson: String

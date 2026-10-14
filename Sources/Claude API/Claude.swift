@@ -17,6 +17,11 @@ public struct Claude {
     )
   }
 
+  init(client: ClaudeClient, defaultModel: Model = .default) {
+    self.client = client
+    self.defaultModel = defaultModel
+  }
+
   public let defaultModel: Model
 
   public typealias Model = ClaudeClient.Model

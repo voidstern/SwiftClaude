@@ -167,6 +167,14 @@ extension ClaudeClient.MessagesEndpoint.Request.Message.Content {
       )
     }
 
+    public static func thinking(_ thinking: String, signature: String) -> Block {
+      Block(Thinking(thinking: thinking, signature: signature))
+    }
+
+    public static func redactedThinking(_ data: String) -> Block {
+      Block(RedactedThinking(data: data))
+    }
+
     public static func toolUse(
       id: ClaudeClient.MessagesEndpoint.ToolUse.ID,
       name: String,
@@ -218,6 +226,15 @@ extension ClaudeClient.MessagesEndpoint.Request.Message.Content {
       private let type = "text"
 
       let text: String
+    }
+    private struct Thinking: Encodable, Sendable {
+      private let type = "thinking"
+      let thinking: String
+      let signature: String
+    }
+    private struct RedactedThinking: Encodable, Sendable {
+      private let type = "redacted_thinking"
+      let data: String
     }
     private struct ToolUse: Encodable, Sendable {
       init(
